@@ -14,11 +14,13 @@ export class Board {
 
   
 
-  // drop(entity:String){
-    
-  // }
+  drop(entity:String){
+    let emptyRow = '.'.repeat(this.width) + '\n'
+    let entityRow = `.${entity}.` + '\n'
+    return (entityRow + emptyRow.repeat(this.height - 1))
+  }
 }
 
 
-// let board = new Board(3, 3);
-// console.log(board.toString());
+let board = new Board(3, 3);
+console.log(board.drop('X'));
