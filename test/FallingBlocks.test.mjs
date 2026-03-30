@@ -1,6 +1,6 @@
 import { beforeEach, describe, test } from "vitest";
 import { expect } from "chai";
-import { Board } from "../src/Board.mjs";
+import { Board } from "../src/Board.js";
 
 describe("Falling blocks", () => {
   let board;
@@ -16,13 +16,13 @@ describe("Falling blocks", () => {
     );
   });
 
-  /*
+
   describe("When a block is dropped", () => {
     beforeEach(() => {
       board.drop("X");
-    });
+    }); 
 
-    test("it starts from the top middle", () => {
+    test.skip("it starts from the top middle", () => {
       expect(board.toString()).to.equalShape(
         `.X.
          ...
@@ -47,7 +47,7 @@ describe("Falling blocks", () => {
       expect(after).to.equal(before);
     });
   });
-  */
+
 
   /*
   describe("When a block reaches the bottom", () => {

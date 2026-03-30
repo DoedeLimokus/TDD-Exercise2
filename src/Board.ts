@@ -2,7 +2,7 @@ export class Board {
   width;
   height;
 
-  constructor(width, height) {
+  constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
   }
@@ -14,8 +14,11 @@ export class Board {
 
   
 
-  // drop(){
-
-  // }
+  drop(entity:String){
+    
+  }
 }
 
+
+// let board = new Board(3, 3);
+// console.log(board.toString());
