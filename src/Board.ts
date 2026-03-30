@@ -8,6 +8,7 @@ export class Board {
   emptyRowArray: Array<string>
   currentField: Array<Array<string>>
   dropStatus: number;
+  hasFallingStatus: number;
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -18,6 +19,7 @@ export class Board {
     this.tickState = 0;
     this.currentField = Array()
     this.dropStatus = 0
+    this.hasFallingStatus = 1
 
     // console.log("init")
     this.emptyRowArray = new Array(this.width).fill('.')
@@ -42,14 +44,20 @@ export class Board {
     }
     if (this.state == 2 && this.tickState == 1){
       // console.log("Tick")
-      this.tickState = 0
-      let pos1 = this.entityPosition
-      let row1 = this.currentField[this.entityPosition]
-      this.entityPosition++
-      let pos2 = this.entityPosition
-      let row2 = this.currentField[this.entityPosition]
-      this.currentField[pos1] = row2
-      this.currentField[pos2] = row1
+      let posRow = this.currentField[this.entityPosition].indexOf("X")
+      let checkSpot = this.currentField[this.entityPosition + 1][posRow]
+      if (checkSpot == '.'){
+        this.tickState = 0
+        let pos1 = this.entityPosition
+        let row1 = this.currentField[this.entityPosition]
+        this.entityPosition++
+        let pos2 = this.entityPosition
+        let row2 = this.currentField[this.entityPosition]
+        this.currentField[pos1] = row2
+        this.currentField[pos2] = row1
+    } else if ((this.entityPosition + 1) > this.height){
+      this.hasFallingStatus = 0
+    }
   }
     return (this.currentField.map(rij => rij.join(''))).join('')
   }
@@ -65,6 +73,10 @@ export class Board {
 
   tick(){
     this.tickState = 1;
+  }
+
+  hasFalling(){
+    return this.hasFallingStatus
   }
 }
 
