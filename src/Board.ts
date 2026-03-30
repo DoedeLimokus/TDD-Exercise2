@@ -16,21 +16,23 @@ export class Board {
   toString() {
     let emptyRowArray = new Array(this.width).fill('.')
     emptyRowArray.push('\n')
-    let emptyRow = emptyRowArray.join('')
-    let currentField
+    let currentField = Array()
     if (this.state == 0) {
-      let initial = emptyRow.repeat(this.height);
-      currentField = initial;
+      let initial = emptyRowArray
+      for (let i=1; i<= this.height; i++) {
+      currentField.push(initial);
+      }
     } else if (this.state == 1) {
       let entityRowArray = [...emptyRowArray]
       entityRowArray[Math.floor(this.width / 2)] = this.entity
-      let entityRow = entityRowArray.join('')
-      currentField = entityRow + emptyRow.repeat(this.height - 1);
+      currentField.push(entityRowArray);
+      for (let i=1; i<= (this.height - 1); i++) {
+        currentField.push(emptyRowArray);
+      }
     } else if (this.tickState == 1){
       this.tickState = 0
-
     }
-    return currentField
+    return (currentField.map(rij => rij.join(''))).join('')
   }
 
   drop(entity: string) {
