@@ -13,14 +13,14 @@ export class Board {
 
   toString() {
     let emptyRowArray = new Array(this.width).fill('.')
-    let emptyRow = emptyRowArray.join('')
+    let emptyRow = emptyRowArray.join('') + "\n"
     if (this.state == 0) {
-      let initial = (emptyRow + "\n").repeat(this.height);
+      let initial = emptyRow.repeat(this.height);
       return initial;
     } else if (this.state == 1) {
-      let entityRowArray = emptyRowArray
-      entityRowArray[this.width / 2] = this.entity
-      let entityRow = `.${this.entity}.` + "\n";
+      let entityRowArray = [...emptyRowArray]
+      entityRowArray[Math.floor(entityRowArray.length / 2)] = this.entity
+      let entityRow = entityRowArray.join('') + "\n";
       return entityRow + emptyRow.repeat(this.height - 1);
     }
   }
@@ -32,4 +32,5 @@ export class Board {
 }
 
 let board = new Board(3, 3);
-console.log(board.drop("X"));
+board.drop("X")
+console.log(board.toString());
