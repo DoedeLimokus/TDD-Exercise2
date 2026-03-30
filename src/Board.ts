@@ -1,15 +1,19 @@
 export class Board {
   width;
   height;
+  state:number;
 
   constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
+    this.state = 0;
   }
 
   toString() {
-    let antwoord = ('.'.repeat(this.width) + '\n').repeat(this.height);
-    return antwoord;
+    let initial = ('.'.repeat(this.width) + '\n').repeat(this.height);
+    if (this.state == 0){
+      return initial;
+    }
   }
 
   
@@ -23,4 +27,4 @@ export class Board {
 
 
 let board = new Board(3, 3);
-console.log(board.drop('X'));
+console.log(board.drop("X"));
