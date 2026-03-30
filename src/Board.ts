@@ -14,9 +14,9 @@ export class Board {
 
   
 
-  drop(entity:String){
+  // drop(entity:String){
     
-  }
+  // }
 }
 
 
