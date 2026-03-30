@@ -5,6 +5,8 @@ export class Board {
   entity: string;
   entityPosition: number;
   tickState: number;
+  emptyRowArray: Array<string>
+  currentField: Array<Array<string>>
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -13,37 +15,38 @@ export class Board {
     this.entity = "";
     this.entityPosition = 0;
     this.tickState = 1;
+
+    this.currentField = Array()
+
+    this.emptyRowArray = new Array(this.width).fill('.')
+    this.emptyRowArray.push('\n')
+    let initial = this.emptyRowArray
+    for (let i=1; i<= this.height; i++) {
+    this.currentField.push(initial);
+    }
   }
 
   toString() {
-    let emptyRowArray = new Array(this.width).fill('.')
-    emptyRowArray.push('\n')
-    let currentField = Array()
-    if (this.state == 0) {
-      let initial = emptyRowArray
-      for (let i=1; i<= this.height; i++) {
-      currentField.push(initial);
-      }
-    } else if (this.state == 1) {
+    if (this.state == 1) {
       this.state = 2
-      let entityRowArray = [...emptyRowArray]
+      let entityRowArray = [...this.emptyRowArray]
       entityRowArray[Math.floor(this.width / 2)] = this.entity
-      currentField.push(entityRowArray);
+      this.currentField.push(entityRowArray);
       for (let i=1; i<= (this.height - 1); i++) {
-        currentField.push(emptyRowArray);
+        this.currentField.push(this.emptyRowArray);
       }
     }
     if (this.tickState == 1 && this.state == 2){
-    this.tickState = 0
-    let pos1 = this.entityPosition
-    let row1 = currentField[this.entityPosition]
-    this.entityPosition++
-    let pos2 = this.entityPosition
-    let row2 = currentField[this.entityPosition]
-    currentField[pos1] = row2
-    currentField[pos2] = row1
+      this.tickState = 0
+      let pos1 = this.entityPosition
+      let row1 = this.currentField[this.entityPosition]
+      this.entityPosition++
+      let pos2 = this.entityPosition
+      let row2 = this.currentField[this.entityPosition]
+      this.currentField[pos1] = row2
+      this.currentField[pos2] = row1
   }
-    return (currentField.map(rij => rij.join(''))).join('')
+    return (this.currentField.map(rij => rij.join(''))).join('')
   }
 
   drop(entity: string) {
