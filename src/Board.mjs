@@ -8,6 +8,14 @@ export class Board {
   }
 
   toString() {
-    return "TODO";
+    let antwoord = ('.'.repeat(this.width) + '\n').repeat(this.height);
+    return antwoord;
   }
+
+  
+
+  // drop(){
+
+  // }
 }
+
