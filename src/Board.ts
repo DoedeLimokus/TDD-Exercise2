@@ -9,7 +9,7 @@ export class Board {
   currentField: Array<Array<string>>;
   dropStatus: number;
   hasFallingStatus: boolean;
-  shapes: Array<string>
+  shapes: Array<string>;
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -19,7 +19,7 @@ export class Board {
     this.entityPosition = 0;
     this.tickState = 0;
     this.currentField = Array();
-    this.shapes = Array()
+    this.shapes = Array();
     this.dropStatus = 0;
     this.hasFallingStatus = true;
 
@@ -38,26 +38,26 @@ export class Board {
     if (this.state == 1 && this.dropStatus == 1) {
       // console.log("Drop");
       // console.log("Aan het droppen")
-      this.hasFallingStatus = true
+      this.hasFallingStatus = true;
       this.dropStatus = 0;
       this.state = 2;
       let entityRowArray = [...this.emptyRowArray];
       entityRowArray[Math.floor(this.width / 2)] = this.entity;
       this.currentField[0] = entityRowArray;
-      this.shapes.push(this.entity)
+      this.shapes.push(this.entity);
       // console.log(this.shapes)
     }
 
     if (this.state == 2 && this.tickState == 1) {
       // console.log("Tick");
       this.tickState = 0;
-      let currentShape = this.shapes.at(-1) ?? ""
+      let currentShape = this.shapes.at(-1) ?? "";
       let posRow = this.currentField[this.entityPosition].indexOf(currentShape);
       if (this.entityPosition + 1 > this.height - 1) {
         // Blok kan niet verder: Gamestate -> 1, FallingStatus -> false, entityposition -> 0
         this.hasFallingStatus = false;
-        this.state = 1
-        this.entityPosition = 0
+        this.state = 1;
+        this.entityPosition = 0;
         // console.log("Op de bodem, kan niet verder")
       } else {
         let checkSpot = this.currentField[this.entityPosition + 1][posRow];
@@ -75,9 +75,9 @@ export class Board {
         } else {
           // Blok kan niet verder: Gamestate -> 1, FallingStatus -> false, entityposition -> 0
           // console.log("Andere letter eronder")
-          this.hasFallingStatus = false
-          this.state = 1
-          this.entityPosition = 0
+          this.hasFallingStatus = false;
+          this.state = 1;
+          this.entityPosition = 0;
         }
       }
     }
@@ -90,13 +90,13 @@ export class Board {
     } else {
       this.dropStatus = 1;
       this.entity = entity;
-      this.toString()
+      this.toString();
     }
   }
 
   tick() {
     this.tickState = 1;
-    this.toString()
+    this.toString();
   }
 
   hasFalling() {
@@ -120,8 +120,6 @@ let board = new Board(3, 3);
 // board.tick()
 // console.log(board.toString());
 // console.log(board.hasFalling())
-
-
 
 // console.log(board.toString());
 // console.log(board.state);

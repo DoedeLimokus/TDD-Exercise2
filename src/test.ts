@@ -1,20 +1,18 @@
-export class Auto{
-    bandSoort = ''
+export class Auto {
+  bandSoort = "";
 
-    constructor(){
-    }
+  constructor() {}
 
-    static band(soort:string){
-        const BMW = new Auto
-        BMW.bandSoort = soort
-        return BMW
-    }
+  static band(soort: string) {
+    const BMW = new Auto();
+    BMW.bandSoort = soort;
+    return BMW;
+  }
 
-    printBand(){
-        return this.bandSoort
-    }
-
+  printBand() {
+    return this.bandSoort;
+  }
 }
 
-const NieuweBMW = Auto.band("Winter")
-console.log(NieuweBMW.printBand())
+const NieuweBMW = Auto.band("Winter");
+console.log(NieuweBMW.printBand());

@@ -22,7 +22,7 @@ Remember to follow the [three laws of TDD](https://tdd.mooc.fi/1-tdd#three-laws-
 failing test before making it pass.
 
 Also remember to follow the [red-green-refactor](https://tdd.mooc.fi/1-tdd#red-green-refactor) cycle. In particular, run
-each test immediately after writing it, so that you will *see it fail*. That's important for "testing the test", to
+each test immediately after writing it, so that you will _see it fail_. That's important for "testing the test", to
 ensure that the test is testing what you think it's testing, and that the failure message is understandable.
 
 ## 55% done 🚀 [Continue to the next level](level-6.md)
