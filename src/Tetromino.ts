@@ -1,3 +1,4 @@
+import { Board } from "./Board.ts";
 import { RotatingShape } from "./RotatingShapes.ts";
 
 export class Tetromino {
@@ -59,7 +60,13 @@ export class Tetromino {
   ]);
 }
 
-const Tetris = Tetromino.T_SHAPE;
-console.log(Tetris.toString());
-console.log(Tetris.rotateRight().toString());
-console.log(Tetris.rotateLeft().toString());
+// const Tetris = Tetromino.T_SHAPE;
+// console.log(Tetris.toString());
+// console.log(Tetris.rotateRight().toString());
+// console.log(Tetris.rotateLeft().toString());
+
+// let board
+// board = new Board(3, 3)
+// board.drop(Tetromino.T_SHAPE)
+// board.drop("X")
+// console.log(board.toString())

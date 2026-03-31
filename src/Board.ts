@@ -36,16 +36,54 @@ export class Board {
   toString() {
     // console.log(this.state)
     if (this.state == 1 && this.dropStatus == 1) {
-      // console.log("Drop");
-      // console.log("Aan het droppen")
-      this.hasFallingStatus = true;
-      this.dropStatus = 0;
-      this.state = 2;
-      let entityRowArray = [...this.emptyRowArray];
-      entityRowArray[Math.floor(this.width / 2)] = this.entity;
-      this.currentField[0] = entityRowArray;
-      this.shapes.push(this.entity);
-      // console.log(this.shapes)
+      if (this.entity == `.T.\nTTT\n...\n`){
+        let block = 'T'
+        this.hasFallingStatus = true;
+        this.dropStatus = 0;
+        this.state = 2;
+        let entityRowArray1 = [...this.emptyRowArray];
+        let entityRowArray2 = [...this.emptyRowArray];
+
+        entityRowArray1[Math.floor(this.width / 2) - 1] = block;
+        entityRowArray2.splice((Math.floor(this.width / 2) - 2), 3, 'T', 'T', 'T')
+        this.currentField[0] = entityRowArray1;
+        this.currentField[1] = entityRowArray2;
+        this.shapes.push('T', 'T', 'T');
+      }
+      else if(this.entity == `.....\n.....\nIIII.\n.....\n.....\n`){
+        let block = 'I'
+        this.hasFallingStatus = true;
+        this.dropStatus = 0;
+        this.state = 2;
+        let entityRowArray = [...this.emptyRowArray];
+
+        entityRowArray[Math.floor(this.width / 2)] = this.entity;
+        this.currentField[0] = entityRowArray;
+        this.shapes.push(this.entity);
+
+      }
+      else if(this.entity == `.OO\n.OO\n...\n`){
+        let block = 'O'
+        this.hasFallingStatus = true;
+        this.dropStatus = 0;
+        this.state = 2;
+        let entityRowArray1 = [...this.emptyRowArray];
+        let entityRowArray2 = [...this.emptyRowArray];
+
+        entityRowArray1[Math.floor(this.width / 2)] = this.entity;
+        entityRowArray2[Math.floor(this.width / 2)] = this.entity;
+        this.currentField[0] = entityRowArray1;
+        this.currentField[1] = entityRowArray2;
+        this.shapes.push(this.entity);
+      } else {
+        this.hasFallingStatus = true;
+        this.dropStatus = 0;
+        this.state = 2;
+        let entityRowArray = [...this.emptyRowArray];
+        entityRowArray[Math.floor(this.width / 2)] = this.entity;
+        this.currentField[0] = entityRowArray;
+        this.shapes.push(this.entity);
+      }
     }
 
     if (this.state == 2 && this.tickState == 1) {
@@ -84,7 +122,7 @@ export class Board {
     return this.currentField.map((rij) => rij.join("")).join("");
   }
 
-  drop(entity: string) {
+  drop(entity: any) {
     if (this.state != 1) {
       throw new Error("already falling");
     } else {
