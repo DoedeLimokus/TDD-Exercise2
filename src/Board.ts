@@ -1,3 +1,5 @@
+import { Tetromino } from "./Tetromino.ts";
+
 export class Board {
   width;
   height;
@@ -37,18 +39,7 @@ export class Board {
     // console.log(this.state)
     if (this.state == 1 && this.dropStatus == 1) {
       if (this.entity == `.T.\nTTT\n...\n`){
-        let block = 'T'
-        this.hasFallingStatus = true;
-        this.dropStatus = 0;
-        this.state = 2;
-        let entityRowArray1 = [...this.emptyRowArray];
-        let entityRowArray2 = [...this.emptyRowArray];
-
-        entityRowArray1[Math.floor(this.width / 2) - 1] = block;
-        entityRowArray2.splice((Math.floor(this.width / 2) - 2), 3, 'T', 'T', 'T')
-        this.currentField[0] = entityRowArray1;
-        this.currentField[1] = entityRowArray2;
-        this.shapes.push('T', 'T', 'T');
+        this.dropOnBoard()
       }
       else if(this.entity == `.....\n.....\nIIII.\n.....\n.....\n`){
         let block = 'I'
@@ -128,9 +119,29 @@ export class Board {
     } else {
       this.dropStatus = 1;
       this.entity = entity;
+      console.log(`Entity: ${this.entity}`)
       this.toString();
     }
   }
+
+  dropOnBoard(){
+    const t = Tetromino.T_SHAPE
+    let shapeString = t.toString()
+    let shape = shapeString.trim().split("\n").map(line => line.split(""));
+    let startX = Math.floor(this.width / 2) - (Math.floor(shape[0].length / 2)) - 1
+    for(let i=0; i < shape.length; i++){
+      for(let j=0; j < shape[0].length; j++){
+        if (shape[i][j] != '.'){
+          if ((this.currentField[this.entityPosition + i][startX + j]) == '.'){
+            this.currentField[this.entityPosition + i][startX + j] = shape[i][j]
+          } else {
+            throw new Error("Er is hier geen plek voor de vorm")
+          }
+        }
+      }
+    }
+  }
+
 
   tick() {
     this.tickState = 1;
@@ -142,9 +153,12 @@ export class Board {
   }
 }
 
-let board = new Board(3, 3);
-// board.drop("X");
+
+let board = new Board(10,6);
 // console.log(board.toString());
+board.dropOnBoard()
+console.log(board.toString());
+// board.drop("X");
 // board.tick();
 // console.log(board.toString());
 // board.tick();
@@ -162,3 +176,5 @@ let board = new Board(3, 3);
 // console.log(board.toString());
 // console.log(board.state);
 // console.log(board.hasFalling());
+
+

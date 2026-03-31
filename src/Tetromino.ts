@@ -47,16 +47,16 @@ export class Tetromino {
         .....`),
 
     RotatingShape.fromString(`..I..
-    ..I..
-    ..I..
-    ..I..
-    .....`),
+        ..I..
+        ..I..
+        ..I..
+        .....`),
   ]);
 
   static O_SHAPE = new Tetromino([
     RotatingShape.fromString(`.OO
-    .OO
-    ...`),
+        .OO
+        ...`),
   ]);
 }
 
@@ -65,8 +65,9 @@ export class Tetromino {
 // console.log(Tetris.rotateRight().toString());
 // console.log(Tetris.rotateLeft().toString());
 
+// const Tetris = Tetromino.T_SHAPE
 // let board
-// board = new Board(3, 3)
-// board.drop(Tetromino.T_SHAPE)
-// board.drop("X")
+// board = new Board(10, 6)
+// board.drop(Tetris)
 // console.log(board.toString())
+// console.log(Tetris.rotateLeft().toString())
