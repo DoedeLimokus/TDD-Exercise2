@@ -12,6 +12,7 @@ export class Board {
   dropStatus: number;
   hasFallingStatus: boolean;
   shapes: Array<string>;
+  currentEntityMemory: Array<Array<number>>
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -24,6 +25,7 @@ export class Board {
     this.shapes = Array();
     this.dropStatus = 0;
     this.hasFallingStatus = true;
+    this.currentEntityMemory = Array()
 
     // console.log("init")
     this.emptyRowArray = new Array(this.width).fill(".");
@@ -33,13 +35,17 @@ export class Board {
       this.currentField.push([...this.emptyRowArray]);
     }
     this.state = 1;
+    // console.log(`Init currentField: \n${this.currentField}`)
   }
 
   toString() {
-    // console.log(this.state)
     if (this.state == 1 && this.dropStatus == 1) {
-      if (this.entity == `.T.\nTTT\n...\n`){
+      if (this.entity == `T`){
+        console.log(`Call dropOnBoard met entity: ${this.entity}`)
         this.dropOnBoard()
+        this.hasFallingStatus = true;
+        this.dropStatus = 0;
+        this.state = 2;
       }
       else if(this.entity == `.....\n.....\nIIII.\n.....\n.....\n`){
         let block = 'I'
@@ -76,38 +82,27 @@ export class Board {
         this.shapes.push(this.entity);
       }
     }
-
     if (this.state == 2 && this.tickState == 1) {
-      // console.log("Tick");
       this.tickState = 0;
-      let currentShape = this.shapes.at(-1) ?? "";
-      let posRow = this.currentField[this.entityPosition].indexOf(currentShape);
-      if (this.entityPosition + 1 > this.height - 1) {
-        // Blok kan niet verder: Gamestate -> 1, FallingStatus -> false, entityposition -> 0
+      let result = this.moveOnBoard()
+
+      if (result == 0){
+        console.log("Er zit een element onder je")
+        // Geen plek -> Er zit een element onder je
         this.hasFallingStatus = false;
         this.state = 1;
         this.entityPosition = 0;
-        // console.log("Op de bodem, kan niet verder")
-      } else {
-        let checkSpot = this.currentField[this.entityPosition + 1][posRow];
-        if (checkSpot === ".") {
-          // console.log(". gevonden dus kan verder.")
-          // Blok kan nog verder
-          let pos1 = this.entityPosition;
-          let row1 = this.currentField[this.entityPosition];
-          this.entityPosition++;
-          // console.log(this.entityPosition)
-          let pos2 = this.entityPosition;
-          let row2 = this.currentField[this.entityPosition];
-          this.currentField[pos1] = row2;
-          this.currentField[pos2] = row1;
-        } else {
-          // Blok kan niet verder: Gamestate -> 1, FallingStatus -> false, entityposition -> 0
-          // console.log("Andere letter eronder")
-          this.hasFallingStatus = false;
-          this.state = 1;
-          this.entityPosition = 0;
-        }
+      } 
+      else if (result == 1){
+        // console.log(`moveOnBoard succes!`)
+        // Succes!
+      } 
+      else if (result == 2){
+        console.log("Het element heeft de grens bereikt")
+        // entity heeft de grens bereikt
+        this.hasFallingStatus = false;
+        this.state = 1;
+        this.entityPosition = 0;
       }
     }
     return this.currentField.map((rij) => rij.join("")).join("");
@@ -119,29 +114,83 @@ export class Board {
     } else {
       this.dropStatus = 1;
       this.entity = entity;
-      console.log(`Entity: ${this.entity}`)
+      // console.log(`Entity: ${this.entity}`)
       this.toString();
     }
   }
 
+  // Voor het droppen van een nieuw element op het bord
   dropOnBoard(){
-    const t = Tetromino.T_SHAPE
+    // console.log(`dropOnBoard currentField: \n${this.currentField}`)
+    // console.log(`dropOnBoard currentEntityMemory: \n${this.currentEntityMemory}`)
+    const t = Tetromino.T_SHAPE 
+    this.currentEntityMemory.length = 0
     let shapeString = t.toString()
-    let shape = shapeString.trim().split("\n").map(line => line.split(""));
-    let startX = Math.floor(this.width / 2) - (Math.floor(shape[0].length / 2)) - 1
-    for(let i=0; i < shape.length; i++){
-      for(let j=0; j < shape[0].length; j++){
-        if (shape[i][j] != '.'){
+    let shapeArray = shapeString.trim().split("\n").map(line => line.split(""));
+    let startX = Math.floor(this.width / 2) - (Math.floor(shapeArray[0].length / 2)) - 1 // <- Deze is alleen voor T
+
+    for(let i=0; i < shapeArray.length; i++){
+      for(let j=0; j < shapeArray[0].length; j++){
+        if (shapeArray[i][j] != '.'){
           if ((this.currentField[this.entityPosition + i][startX + j]) == '.'){
-            this.currentField[this.entityPosition + i][startX + j] = shape[i][j]
+            this.currentField[this.entityPosition + i][startX + j] = shapeArray[i][j]
+            this.currentEntityMemory.push(Array((this.entityPosition + i), (startX + j)))
           } else {
-            throw new Error("Er is hier geen plek voor de vorm")
+            this.currentEntityMemory.length = 0
+            throw new Error(`Er is hier geen plek voor de vorm: X = ${startX + j}, Y = ${this.entityPosition + i}`)
           }
         }
       }
     }
+    // console.log(`Element gedropped, currentField: \n${this.currentField}`)
   }
 
+  // Voor het tekenen van een element op het bord
+  drawOnBoard(){
+    const t = Tetromino.T_SHAPE
+    let newCurrentEntityMemory = Array()
+    let shapeString = t.toString()
+    let shapeArray = shapeString.trim().split("\n").map(line => line.split(""));
+    let startX = Math.floor(this.width / 2) - (Math.floor(shapeArray[0].length / 2)) - 1 // <- Deze is alleen voor T
+    for(let i=0; i < shapeArray.length; i++){
+      for(let j=0; j < shapeArray[0].length; j++){
+        if (shapeArray[i][j] != '.'){
+          if ((this.currentField[this.entityPosition + i][startX + j]) == '.'){
+            this.currentField[this.entityPosition + i][startX + j] = shapeArray[i][j]
+            newCurrentEntityMemory.push(Array((this.entityPosition + i), (startX + j)))
+          } else {
+            newCurrentEntityMemory.length = 0
+            return "Geen plek"
+          }
+        }
+      }
+    }
+    // console.log(`drawOnBoard this.currentField= \n${this.currentField}`)
+    // console.log(`drawOnBoard newCurrentEntityMemory= \n${newCurrentEntityMemory}`)
+    return [...newCurrentEntityMemory]
+  }
+  // Voor het verplaatsen van een element
+  moveOnBoard(){
+    // Plekken op currentField die in de currentEntityMemory staan leeg halen
+    // console.log(`moveOnBoard currentEntityMemory: \n${this.currentEntityMemory}`)
+    this.currentEntityMemory.forEach(coord => {this.currentField[coord[0]][coord[1]] = '.'})
+    // console.log(`moveOnBoard currentField zonder element: \n${this.currentField}`)
+    // entityPosition + 1 -> if entityPosition > height => Niet drawOnBoard return 2
+    this.entityPosition++
+    if (this.entityPosition > this.height){
+      return 2
+    }
+    // dropOnBoard aanroepen
+    let newCurrentEntityMemory = this.drawOnBoard() 
+    // met de return currentEntityMemory bijwerken.
+    this.currentEntityMemory.length = 0
+    if (newCurrentEntityMemory == "Geen plek!"){
+      return 0
+    } else {
+    this.currentEntityMemory = [...newCurrentEntityMemory]
+    return 1
+    }
+  }
 
   tick() {
     this.tickState = 1;
@@ -154,13 +203,28 @@ export class Board {
 }
 
 
-let board = new Board(10,6);
+let board = new Board(3,3);
 // console.log(board.toString());
-board.dropOnBoard()
+console.log(`Board.drop: \n`)
+board.drop("T")
 console.log(board.toString());
+console.log(`board.tick1: \n`)
+board.tick()
+console.log(board.toString());
+// console.log(`board.tick2: \n`)
+// board.tick()
+// console.log(board.toString());
+// console.log(`board.tick3: \n`)
+// board.tick()
+// console.log(board.toString());
+// console.log(`board.tick4: \n`)
+// board.tick()
+// console.log(board.toString());
+// console.log(`board.tick5: \n`)
+// board.tick()
+// console.log(board.toString());
 // board.drop("X");
 // board.tick();
-// console.log(board.toString());
 // board.tick();
 // console.log(board.toString());
 // board.tick();
