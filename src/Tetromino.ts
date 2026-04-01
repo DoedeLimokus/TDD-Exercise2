@@ -24,6 +24,9 @@ export class Tetromino {
     return new Tetromino(this.orientations, nextIndex);
   }
 
+  static X = new Tetromino([RotatingShape.fromString(`X`)])
+  static Y = new Tetromino([RotatingShape.fromString(`Y`)])
+
   static T_SHAPE = new Tetromino([
     RotatingShape.fromString(`.T.
     TTT
