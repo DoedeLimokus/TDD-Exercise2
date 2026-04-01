@@ -76,7 +76,7 @@ export class Board {
         // console.log(`moveOnBoard succes!`)
       } 
       else if (result == 2){
-        // console.log("Het element heeft de grens bereikt")
+        console.log("Het element heeft de grens bereikt")
         this.hasFallingStatus = false;
         this.state = 1;
         this.entityPosition = 0;
@@ -194,8 +194,18 @@ export class Board {
     // console.log(`moveOnBoard currentEntityMemory: \n${this.currentEntityMemory}`)
     let copyCurrentField = this.currentField.map(row => [...row])
     this.entityPosition++
-    if (this.entityPosition >= this.height){
-      return 2
+    if (["T_SHAPE"].includes(this.entity)){
+      if (this.entityPosition + 1 >= this.height){
+        return 2
+      }
+    } else if (["I_SHAPE"].includes(this.entity)) {
+      if (this.entityPosition + 2 >= this.height){
+        return 2
+      }
+    } else {
+      if (this.entityPosition >= this.height){
+        return 2
+      }
     }
     this.currentEntityMemory.forEach(coord => {this.currentField[coord[0]][coord[1]] = '.'})
     // console.log(`moveOnBoard currentField zonder element: \n${this.currentField}`)
@@ -225,27 +235,45 @@ export class Board {
 }
 
 
-let board = new Board(3,3);
+let board = new Board(10,6);
 // console.log(board.toString());
 console.log(`Board.drop1: \n`)
-board.drop("X")
+board.drop("I")
 console.log(board.toString());
 console.log(`board.tick1: \n`)
 board.tick()
+console.log(`board.tick1: ${board.entityPosition}`)
 console.log(board.toString());
 console.log(`board.tick2: \n`)
 board.tick()
+console.log(`board.tick2: ${board.entityPosition}`)
 console.log(board.toString());
 console.log(`board.tick3: \n`)
 board.tick()
+console.log(`board.tick3: ${board.entityPosition}`)
 console.log(board.toString());
-console.log(`Board.drop2: \n`)
-board.drop("Y")
-console.log(board.toString());
+// console.log(`Board.drop2: \n`)
+// board.drop("Y")
+// console.log(board.toString());
 console.log(`board.tick4: \n`)
 board.tick()
+console.log(`board.tick4: ${board.entityPosition}`)
 console.log(board.toString());
 console.log(`board.tick5: \n`)
+board.tick()
+console.log(`board.tick5: ${board.entityPosition}`)
+console.log(board.toString());
+console.log(`board.tick6: \n`)
+board.tick()
+console.log(`board.tick6: ${board.entityPosition}`)
+console.log(board.toString());
+console.log(`board.tick7: \n`)
+board.tick()
+console.log(board.toString());
+console.log(`board.tick8: \n`)
+board.tick()
+console.log(board.toString());
+console.log(`board.tick9: \n`)
 board.tick()
 console.log(board.toString());
 // board.drop("X");
