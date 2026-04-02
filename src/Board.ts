@@ -238,7 +238,7 @@ export class Board {
 let board = new Board(10,6);
 // console.log(board.toString());
 console.log(`Board.drop1: \n`)
-board.drop("I")
+board.drop("T")
 console.log(board.toString());
 console.log(`board.tick1: \n`)
 board.tick()
@@ -267,6 +267,9 @@ console.log(`board.tick6: \n`)
 board.tick()
 console.log(`board.tick6: ${board.entityPosition}`)
 console.log(board.toString());
+console.log(`Board.drop2: \n`)
+board.drop("T")
+console.log(board.toString());
 console.log(`board.tick7: \n`)
 board.tick()
 console.log(board.toString());
@@ -274,6 +277,16 @@ console.log(`board.tick8: \n`)
 board.tick()
 console.log(board.toString());
 console.log(`board.tick9: \n`)
+board.tick()
+console.log(board.toString());
+console.log(board.toString());
+console.log(`board.tick10: \n`)
+board.tick()
+console.log(board.toString());
+console.log(`board.tick11: \n`)
+board.tick()
+console.log(board.toString());
+console.log(`board.tick12: \n`)
 board.tick()
 console.log(board.toString());
 // board.drop("X");
