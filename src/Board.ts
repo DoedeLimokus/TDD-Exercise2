@@ -1,3 +1,4 @@
+import { parseJSON } from "@ai-sdk/provider-utils";
 import { Tetromino } from "./Tetromino.ts";
 
 export class Board {
@@ -16,7 +17,8 @@ export class Board {
   heightOffset: number
   widthOffset: number
   xCoord: number
-  newDirection: "LEFT"|"RIGHT"|"DOWN"
+  newDirection: "LEFT"|"RIGHT"|"DOWN"|"ROTATION LEFT"|"ROTATION RIGHT"
+  rotation: number
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -34,6 +36,7 @@ export class Board {
     this.widthOffset = 0
     this.xCoord = this.width / 2
     this.newDirection = "DOWN"
+    this.rotation = 0
 
     // console.log("init")
     this.emptyRowArray = new Array(this.width).fill(".");
@@ -82,7 +85,10 @@ export class Board {
       }
       else if (result == 1){
         // console.log(`moveOnBoard succes!`)
-      } 
+      }
+      else if (result == 4){
+        // Rotatie niet mogelijk
+      }
       else if (result == 2){
         console.log("Het element heeft de grens bereikt")
         this.hasFallingStatus = false;
@@ -177,7 +183,17 @@ export class Board {
     // console.log(`drawOnBoard currentEntityMemory input: ${this.currentEntityMemory}`)
     // console.log(`drawOnBoard newX = ${newX}`)
     // this.currentEntityMemory.forEach(coord => console.log(`Y = ${coord[0]}, X = ${coord[1]} \n Element op die positie: ${this.currentField[coord[0]][coord[1]]}`))
-    const t = Tetromino[shape]
+    let t = Tetromino[shape]
+    console.log(`drawOnBoard: rotation = ${this.rotation}`)
+    if (this.rotation > 0){
+      for (let i = 0; i < this.rotation; i ++){
+        t = t.rotateRight()
+      }
+    } else if (this.rotation < 0 ){
+      for (let i = 0 ; i < (Math.abs(this.rotation)); i++){
+        t = t.rotateLeft()
+      }
+    }
     let newCurrentEntityMemory = Array()
     let shapeString = t.toString()
     let shapeArray = shapeString.trim().split("\n").map(line => line.split(""));
@@ -205,7 +221,7 @@ export class Board {
   }
 
 
-  moveOnBoard(direction: "LEFT"|"RIGHT"|"DOWN" = "DOWN"){
+  moveOnBoard(direction: "LEFT"|"RIGHT"|"DOWN"|"ROTATION RIGHT"|"ROTATION LEFT" = "DOWN"){
     // console.log(`moveOnBoard currentEntityMemory: \n${this.currentEntityMemory}`)
     // console.log(`moveOnBoard direction: ${direction}`)
     let copyCurrentField = this.currentField.map(row => [...row])
@@ -218,7 +234,7 @@ export class Board {
       this.xCoord++
       // console.log(`moveOnBoard RIGHT newXCoord: ${this.xCoord}`)
 
-    } else {
+    } else if (direction == "DOWN") {
       this.entityPosition++
       if (["T_SHAPE"].includes(this.entity)){
         if (this.entityPosition + 1 >= this.height){
@@ -234,7 +250,6 @@ export class Board {
         }
       }
     }
-
     // MAAK DE POSITIE VAN HET VORIGE ELEMENT LEEG 
     this.currentEntityMemory.forEach(coord => {this.currentField[coord[0]][coord[1]] = '.'})
     
@@ -247,8 +262,6 @@ export class Board {
     // ERROR BETEKEND DAT DE NIEUWE PLEK GEEN '.' IS
     if (newCurrentEntityMemory == "Geen plek"){
       if (this.newDirection == "LEFT" || this.newDirection == "RIGHT"){
-        // ELEMENT WILDE NAAR LINKS OF RECHTS MAAR DAAR WAS GEEN PLEK
-        // TODO: ELEMENT MOET TERUG NAAR VORIGE POSITIE (oldCurrentMemory)
         if(this.newDirection == "LEFT"){
           this.xCoord++
         } else if (this.newDirection == "RIGHT") {
@@ -257,14 +270,34 @@ export class Board {
         this.newDirection = "DOWN"
         this.currentField.length = 0
         this.currentField = copyCurrentField.map(row => [...row])
-        // console.log(`moveOnBoard currentField nadat element niet naar zijkant kan: \n${this.currentField}`)
-        // console.log(`moveOnBoard currentEntityMemory nadat element niet naar zijkant kan: ${this.currentEntityMemory}`)
         return 3
+      } else if (this.newDirection == "ROTATION LEFT" || this.newDirection == "ROTATION RIGHT") {
+        // WALL KICK: probeer het element te verschuiven
+        const offsets = [1, -1, 2, -2]
+        for (const offset of offsets) {
+          this.currentField.length = 0
+          this.currentField = copyCurrentField.map(row => [...row])
+          this.currentEntityMemory.forEach(coord => {this.currentField[coord[0]][coord[1]] = '.'})
+          let kickResult = this.drawOnBoard(this.entity, this.xCoord + offset)
+          if (kickResult != "Geen plek") {
+            this.xCoord += offset
+            this.newDirection = "DOWN"
+            this.currentEntityMemory.length = 0
+            this.currentEntityMemory = [...kickResult]
+            return 1
+          }
+        }
+        // Geen wall kick mogelijk, rotatie ongedaan maken
+        if (this.newDirection == "ROTATION LEFT") this.rotation++
+        else if (this.newDirection == "ROTATION RIGHT") this.rotation--
+        this.newDirection = "DOWN"
+        this.currentField.length = 0
+        this.currentField = copyCurrentField.map(row => [...row])
+        return 4
       } else {
         // ELEMENT HEEFT GEEN PLEK MEER ONDER ZICH
         this.currentField.length = 0
         this.currentField = copyCurrentField.map(row => [...row])
-        // console.log(`moveOnBoard currentField nadat element niet naar onder kan: \n${this.currentField}`)
         return 0
     }
     } else {
@@ -273,6 +306,21 @@ export class Board {
       this.currentEntityMemory = [...newCurrentEntityMemory]
       return 1
     }
+  }
+
+
+  rotateRight(){
+    this.rotation++
+    this.tickState = 1
+    this.newDirection = "ROTATION RIGHT"
+    this.toString()
+  }
+  
+  rotateLeft(){
+    this.rotation--
+    this.tickState = 1
+    this.newDirection = "ROTATION LEFT"
+    this.toString()
   }
 
   toLeft(){
@@ -299,15 +347,49 @@ export class Board {
 }
 
 
-let board = new Board(3, 3);
+function fallToBottom(board:any) {
+  for (let i = 0; i < 10; i++) {
+    board.tick();
+  }
+}
+
+
+let board = new Board(10, 6);
 console.log(board.toString());
 console.log(`Board.drop1: \n`)
-board.drop("X")
+board.drop("T")
+console.log(board.toString());
+
+console.log(`board.tick * 10 \n`)
+fallToBottom(board)
+console.log(board,toString())
+
+console.log(`Board.drop2: \n`)
+board.drop("T")
 console.log(board.toString());
 
 console.log(`board.tick1: \n`)
 board.tick()
 console.log(board.toString());
+
+console.log(`RotateRight()`)
+board.rotateRight()
+console.log(board.toString())
+
+console.log(`board.tick2: \n`)
+board.tick()
+console.log(board.toString());
+
+// console.log(`board.tick3: \n`)
+// board.tick()
+// console.log(board.toString());
+
+// console.log(`hasFalling: ${board.hasFalling()}`)
+
+// console.log(`board.tick4: \n`)
+// board.tick()
+// console.log(board.toString());
+
 
 // console.log(`board.right1: \n`)
 // board.toRight()
@@ -341,54 +423,6 @@ console.log(board.toString());
 // board.toRight()
 // console.log(board.toString());
 
-
-// console.log(`board.tick2: \n`)
-// board.tick()
-// console.log(`board.tick2: ${board.entityPosition}`)
-// console.log(board.toString());
-
-// console.log(`board.tick3: \n`)
-// board.tick()
-// console.log(`board.tick3: ${board.entityPosition}`)
-// console.log(board.toString());
-
-// console.log(`Board.drop2: \n`)
-// board.drop("Y")
-// console.log(board.toString());
-// console.log(`board.tick4: \n`)
-// board.tick()
-// console.log(`board.tick4: ${board.entityPosition}`)
-// console.log(board.toString());
-// console.log(`board.tick5: \n`)
-// board.tick()
-// console.log(`board.tick5: ${board.entityPosition}`)
-// console.log(board.toString());
-// console.log(`board.tick6: \n`)
-// board.tick()
-// console.log(`board.tick6: ${board.entityPosition}`)
-// console.log(board.toString());
-// console.log(`Board.drop2: \n`)
-// board.drop("T")
-// console.log(board.toString());
-// console.log(`board.tick7: \n`)
-// board.tick()
-// console.log(board.toString());
-// console.log(`board.tick8: \n`)
-// board.tick()
-// console.log(board.toString());
-// console.log(`board.tick9: \n`)
-// board.tick()
-// console.log(board.toString());
-// console.log(board.toString());
-// console.log(`board.tick10: \n`)
-// board.tick()
-// console.log(board.toString());
-// console.log(`board.tick11: \n`)
-// board.tick()
-// console.log(board.toString());
-// console.log(`board.tick12: \n`)
-// board.tick()
-// console.log(board.toString());
 
 
 
