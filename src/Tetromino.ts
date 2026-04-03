@@ -61,6 +61,54 @@ export class Tetromino {
         .OO
         ...`),
   ]);
+
+  static L_SHAPE = new Tetromino([
+    RotatingShape.fromString(`..L
+    LLL
+    ...`),
+    RotatingShape.fromString(`.L.
+    .L.
+    .LL`),
+    RotatingShape.fromString(`...
+    LLL
+    L..`),
+    RotatingShape.fromString(`LL.
+    .L.
+    .L.`),
+  ]);
+
+  static J_SHAPE = new Tetromino([
+    RotatingShape.fromString(`J..
+    JJJ
+    ...`),
+    RotatingShape.fromString(`.JJ
+    .J.
+    .J.`),
+    RotatingShape.fromString(`...
+    JJJ
+    ..J`),
+    RotatingShape.fromString(`.J.
+    .J.
+    JJ.`),
+  ]);
+
+  static S_SHAPE = new Tetromino([
+    RotatingShape.fromString(`.SS
+    SS.
+    ...`),
+    RotatingShape.fromString(`S..
+    SS.
+    .S.`),
+  ]);
+
+  static Z_SHAPE = new Tetromino([
+    RotatingShape.fromString(`ZZ.
+    .ZZ
+    ...`),
+    RotatingShape.fromString(`..Z
+    .ZZ
+    .Z.`),
+  ]);
 }
 
 // const Tetris = Tetromino.T_SHAPE;

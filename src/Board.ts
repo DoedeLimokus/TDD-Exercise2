@@ -5,7 +5,7 @@ export class Board {
   width;
   height;
   state: number;
-  entity: "T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"X"|"Y"
+  entity: "T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"L_SHAPE"|"J_SHAPE"|"S_SHAPE"|"Z_SHAPE"|"X"|"Y"
   entityPosition: number;
   tickState: number;
   emptyRowArray: Array<string>;
@@ -51,7 +51,7 @@ export class Board {
 
   toString() {
     if (this.state == 1 && this.dropStatus == 1) {
-      if (["T_SHAPE","I_SHAPE","O_SHAPE","X","Y"].includes(this.entity)){
+      if (["T_SHAPE","I_SHAPE","O_SHAPE","L_SHAPE","J_SHAPE","S_SHAPE","Z_SHAPE","X","Y"].includes(this.entity)){
         // console.log(`Call dropOnBoard met entity: ${this.entity}`)
         this.dropOnBoard(this.entity)
         this.hasFallingStatus = true;
@@ -134,9 +134,77 @@ export class Board {
         this.widthOffset = 0
         this.heightOffset = 0
         this.toString
+      } else if (entity == "L"){
+        this.dropStatus = 1;
+        this.entity = "L_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity == "J"){
+        this.dropStatus = 1;
+        this.entity = "J_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity == "S"){
+        this.dropStatus = 1;
+        this.entity = "S_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity == "Z"){
+        this.dropStatus = 1;
+        this.entity = "Z_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
       } else if (entity === Tetromino.T_SHAPE) {
         this.dropStatus = 1;
         this.entity = "T_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity === Tetromino.I_SHAPE) {
+        this.heightOffset = -1
+        this.widthOffset = 0
+        this.dropStatus = 1
+        this.entity = "I_SHAPE"
+        this.toString()
+      } else if (entity === Tetromino.O_SHAPE) {
+        this.heightOffset = 0
+        this.widthOffset = -1
+        this.dropStatus = 1
+        this.entity = "O_SHAPE"
+        this.toString()
+      } else if (entity === Tetromino.L_SHAPE) {
+        this.dropStatus = 1;
+        this.entity = "L_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity === Tetromino.J_SHAPE) {
+        this.dropStatus = 1;
+        this.entity = "J_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity === Tetromino.S_SHAPE) {
+        this.dropStatus = 1;
+        this.entity = "S_SHAPE";
+        this.heightOffset = 0
+        this.widthOffset = -1
+        console.log(`Entity: ${this.entity}`)
+        this.toString();
+      } else if (entity === Tetromino.Z_SHAPE) {
+        this.dropStatus = 1;
+        this.entity = "Z_SHAPE";
         this.heightOffset = 0
         this.widthOffset = -1
         console.log(`Entity: ${this.entity}`)
@@ -149,7 +217,7 @@ export class Board {
   }
 
   // Voor het droppen van een nieuw element op het bord
-  dropOnBoard(shape:"T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"X"|"Y"){
+  dropOnBoard(shape:"T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"L_SHAPE"|"J_SHAPE"|"S_SHAPE"|"Z_SHAPE"|"X"|"Y"){
     // console.log(`dropOnBoard currentField: \n${this.currentField}`)
     // console.log(`dropOnBoard currentEntityMemory: \n${this.currentEntityMemory}`)
     const t = Tetromino[shape]
@@ -178,7 +246,7 @@ export class Board {
   }
 
   // Voor het tekenen van een element op het bord
-  drawOnBoard(shape:"T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"X"|"Y", newX: number){
+  drawOnBoard(shape:"T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"L_SHAPE"|"J_SHAPE"|"S_SHAPE"|"Z_SHAPE"|"X"|"Y", newX: number){
     // console.log(`drawOnBoard currentField input: \n${this.currentField}`)
     // console.log(`drawOnBoard currentEntityMemory input: ${this.currentEntityMemory}`)
     // console.log(`drawOnBoard newX = ${newX}`)
@@ -236,7 +304,7 @@ export class Board {
 
     } else if (direction == "DOWN") {
       this.entityPosition++
-      if (["T_SHAPE"].includes(this.entity)){
+      if (["T_SHAPE","L_SHAPE","J_SHAPE","S_SHAPE","Z_SHAPE"].includes(this.entity)){
         if (this.entityPosition + 1 >= this.height){
           return 2
         }
