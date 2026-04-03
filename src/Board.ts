@@ -15,6 +15,8 @@ export class Board {
   currentEntityMemory: Array<Array<number>>
   heightOffset: number
   widthOffset: number
+  xCoord: number
+  newDirection: "LEFT"|"RIGHT"|"DOWN"
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -30,6 +32,8 @@ export class Board {
     this.currentEntityMemory = Array()
     this.heightOffset = 0
     this.widthOffset = 0
+    this.xCoord = this.width / 2
+    this.newDirection = "DOWN"
 
     // console.log("init")
     this.emptyRowArray = new Array(this.width).fill(".");
@@ -64,7 +68,7 @@ export class Board {
     }
     if (this.state == 2 && this.tickState == 1) {
       this.tickState = 0;
-      let result = this.moveOnBoard()
+      let result = this.moveOnBoard(this.newDirection)
 
       if (result == 0){
         // console.log("Er zit een element onder je")
@@ -72,6 +76,10 @@ export class Board {
         this.state = 1;
         this.entityPosition = 0;
       } 
+      else if (result == 3){
+        // console.log("Je kan niet voorbij de zijkant")
+        // Hetzelfde als succes
+      }
       else if (result == 1){
         // console.log(`moveOnBoard succes!`)
       } 
@@ -164,12 +172,16 @@ export class Board {
   }
 
   // Voor het tekenen van een element op het bord
-  drawOnBoard(shape:"T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"X"|"Y"){
+  drawOnBoard(shape:"T_SHAPE"|"I_SHAPE"|"O_SHAPE"|"X"|"Y", newX: number){
+    // console.log(`drawOnBoard currentField input: \n${this.currentField}`)
+    // console.log(`drawOnBoard currentEntityMemory input: ${this.currentEntityMemory}`)
+    // console.log(`drawOnBoard newX = ${newX}`)
+    // this.currentEntityMemory.forEach(coord => console.log(`Y = ${coord[0]}, X = ${coord[1]} \n Element op die positie: ${this.currentField[coord[0]][coord[1]]}`))
     const t = Tetromino[shape]
     let newCurrentEntityMemory = Array()
     let shapeString = t.toString()
     let shapeArray = shapeString.trim().split("\n").map(line => line.split(""));
-    let startX = Math.floor(this.width / 2) - (Math.floor(shapeArray[0].length / 2)) + this.widthOffset
+    let startX = Math.floor(newX) - (Math.floor(shapeArray[0].length / 2)) + this.widthOffset
     for(let i=0; i < shapeArray.length; i++){
       for(let j=0; j < shapeArray[0].length; j++){
         if (shapeArray[i][j] != '.'){
@@ -178,7 +190,10 @@ export class Board {
             newCurrentEntityMemory.push(Array((this.entityPosition + i), (startX + j)))
           } else {
             newCurrentEntityMemory.length = 0
-            // console.log(`drawOnBoard: Geen plek!`)
+            console.log(`drawOnBoard: Geen plek! Op coords: Y = ${this.entityPosition + i}, X = ${startX+ j}`)
+            console.log(`drawOnBoard: Geen plek! Element op coords = ${this.currentField[this.entityPosition + i][startX + j]}`)
+            // console.log(`drawOnBoard: element op Y = 3 en X = 9: ${this.currentField[3][9]}`)
+            // console.log(`drawOnBoard: Huidige veld: \n${this.currentField}`)
             return "Geen plek"
           }
         }
@@ -188,44 +203,93 @@ export class Board {
     // console.log(`drawOnBoard newCurrentEntityMemory= \n${newCurrentEntityMemory}`)
     return [...newCurrentEntityMemory]
   }
-  // Voor het verplaatsen van een element
-  moveOnBoard(){
-    // Plekken op currentField die in de currentEntityMemory staan leeg halen
+
+
+  moveOnBoard(direction: "LEFT"|"RIGHT"|"DOWN" = "DOWN"){
     // console.log(`moveOnBoard currentEntityMemory: \n${this.currentEntityMemory}`)
+    // console.log(`moveOnBoard direction: ${direction}`)
     let copyCurrentField = this.currentField.map(row => [...row])
-    this.entityPosition++
-    if (["T_SHAPE"].includes(this.entity)){
-      if (this.entityPosition + 1 >= this.height){
-        return 2
-      }
-    } else if (["I_SHAPE"].includes(this.entity)) {
-      if (this.entityPosition + 2 >= this.height){
-        return 2
-      }
+
+    // CHECK LINKS RECHTS EN HOOGTE
+    if (direction == "LEFT"){
+      this.xCoord--
+    } else if (direction == "RIGHT"){
+      // console.log(`moveOnBoard RIGHT oldXCoord: ${this.xCoord}`)
+      this.xCoord++
+      // console.log(`moveOnBoard RIGHT newXCoord: ${this.xCoord}`)
+
     } else {
-      if (this.entityPosition >= this.height){
-        return 2
+      this.entityPosition++
+      if (["T_SHAPE"].includes(this.entity)){
+        if (this.entityPosition + 1 >= this.height){
+          return 2
+        }
+      } else if (["I_SHAPE"].includes(this.entity)) {
+        if (this.entityPosition + 2 >= this.height){
+          return 2
+        }
+      } else {
+        if (this.entityPosition >= this.height){
+          return 2
+        }
       }
     }
+
+    // MAAK DE POSITIE VAN HET VORIGE ELEMENT LEEG 
     this.currentEntityMemory.forEach(coord => {this.currentField[coord[0]][coord[1]] = '.'})
+    
     // console.log(`moveOnBoard currentField zonder element: \n${this.currentField}`)
-    // entityPosition + 1 -> if entityPosition > height => Niet drawOnBoard return 2
-    // dropOnBoard aanroepen
-    let newCurrentEntityMemory = this.drawOnBoard(this.entity) 
-    // met de return currentEntityMemory bijwerken.
-    this.currentEntityMemory.length = 0
+    
+    // TEKENEN VAN HET ELEMENT
+    let newCurrentEntityMemory = this.drawOnBoard(this.entity, this.xCoord) 
+    
+    // CHECK WAAR ERROR VANDAAN KOMT
+    // ERROR BETEKEND DAT DE NIEUWE PLEK GEEN '.' IS
     if (newCurrentEntityMemory == "Geen plek"){
-      this.currentField.length = 0
-      this.currentField = [...copyCurrentField]
-      return 0
-    } else {
-    this.currentEntityMemory = [...newCurrentEntityMemory]
-    return 1
+      if (this.newDirection == "LEFT" || this.newDirection == "RIGHT"){
+        // ELEMENT WILDE NAAR LINKS OF RECHTS MAAR DAAR WAS GEEN PLEK
+        // TODO: ELEMENT MOET TERUG NAAR VORIGE POSITIE (oldCurrentMemory)
+        if(this.newDirection == "LEFT"){
+          this.xCoord++
+        } else if (this.newDirection == "RIGHT") {
+          this.xCoord--
+        }
+        this.newDirection = "DOWN"
+        this.currentField.length = 0
+        this.currentField = copyCurrentField.map(row => [...row])
+        // console.log(`moveOnBoard currentField nadat element niet naar zijkant kan: \n${this.currentField}`)
+        // console.log(`moveOnBoard currentEntityMemory nadat element niet naar zijkant kan: ${this.currentEntityMemory}`)
+        return 3
+      } else {
+        // ELEMENT HEEFT GEEN PLEK MEER ONDER ZICH
+        this.currentField.length = 0
+        this.currentField = copyCurrentField.map(row => [...row])
+        // console.log(`moveOnBoard currentField nadat element niet naar onder kan: \n${this.currentField}`)
+        return 0
     }
+    } else {
+      this.newDirection = "DOWN"
+      this.currentEntityMemory.length = 0
+      this.currentEntityMemory = [...newCurrentEntityMemory]
+      return 1
+    }
+  }
+
+  toLeft(){
+    this.tickState = 1
+    this.newDirection = "LEFT"
+    this.toString()
+  }
+
+  toRight(){
+    this.tickState = 1
+    this.newDirection = "RIGHT"
+    this.toString()
   }
 
   tick() {
     this.tickState = 1;
+    this.newDirection = "DOWN"
     this.toString();
   }
 
@@ -235,76 +299,96 @@ export class Board {
 }
 
 
-let board = new Board(10,6);
-// console.log(board.toString());
-console.log(`Board.drop1: \n`)
-board.drop("T")
+let board = new Board(3, 3);
 console.log(board.toString());
+console.log(`Board.drop1: \n`)
+board.drop("X")
+console.log(board.toString());
+
 console.log(`board.tick1: \n`)
 board.tick()
-console.log(`board.tick1: ${board.entityPosition}`)
 console.log(board.toString());
-console.log(`board.tick2: \n`)
-board.tick()
-console.log(`board.tick2: ${board.entityPosition}`)
-console.log(board.toString());
-console.log(`board.tick3: \n`)
-board.tick()
-console.log(`board.tick3: ${board.entityPosition}`)
-console.log(board.toString());
+
+// console.log(`board.right1: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+// console.log(`board.right2: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+// console.log(`board.right3: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+// console.log(`board.right4: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+// console.log(`board.right5: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+// console.log(`board.right: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+// console.log(`board.tick1: \n`)
+// board.tick()
+// console.log(board.toString());
+
+// console.log(`board.right: \n`)
+// board.toRight()
+// console.log(board.toString());
+
+
+// console.log(`board.tick2: \n`)
+// board.tick()
+// console.log(`board.tick2: ${board.entityPosition}`)
+// console.log(board.toString());
+
+// console.log(`board.tick3: \n`)
+// board.tick()
+// console.log(`board.tick3: ${board.entityPosition}`)
+// console.log(board.toString());
+
 // console.log(`Board.drop2: \n`)
 // board.drop("Y")
 // console.log(board.toString());
-console.log(`board.tick4: \n`)
-board.tick()
-console.log(`board.tick4: ${board.entityPosition}`)
-console.log(board.toString());
-console.log(`board.tick5: \n`)
-board.tick()
-console.log(`board.tick5: ${board.entityPosition}`)
-console.log(board.toString());
-console.log(`board.tick6: \n`)
-board.tick()
-console.log(`board.tick6: ${board.entityPosition}`)
-console.log(board.toString());
-console.log(`Board.drop2: \n`)
-board.drop("T")
-console.log(board.toString());
-console.log(`board.tick7: \n`)
-board.tick()
-console.log(board.toString());
-console.log(`board.tick8: \n`)
-board.tick()
-console.log(board.toString());
-console.log(`board.tick9: \n`)
-board.tick()
-console.log(board.toString());
-console.log(board.toString());
-console.log(`board.tick10: \n`)
-board.tick()
-console.log(board.toString());
-console.log(`board.tick11: \n`)
-board.tick()
-console.log(board.toString());
-console.log(`board.tick12: \n`)
-board.tick()
-console.log(board.toString());
-// board.drop("X");
-// board.tick();
-// board.tick();
+// console.log(`board.tick4: \n`)
+// board.tick()
+// console.log(`board.tick4: ${board.entityPosition}`)
 // console.log(board.toString());
-// board.tick();
-// console.log(board.hasFalling())
-// console.log(board.state)
+// console.log(`board.tick5: \n`)
+// board.tick()
+// console.log(`board.tick5: ${board.entityPosition}`)
 // console.log(board.toString());
-// board.drop("Y");
+// console.log(`board.tick6: \n`)
+// board.tick()
+// console.log(`board.tick6: ${board.entityPosition}`)
 // console.log(board.toString());
+// console.log(`Board.drop2: \n`)
+// board.drop("T")
+// console.log(board.toString());
+// console.log(`board.tick7: \n`)
 // board.tick()
 // console.log(board.toString());
-// console.log(board.hasFalling())
-
+// console.log(`board.tick8: \n`)
+// board.tick()
 // console.log(board.toString());
-// console.log(board.state);
-// console.log(board.hasFalling());
+// console.log(`board.tick9: \n`)
+// board.tick()
+// console.log(board.toString());
+// console.log(board.toString());
+// console.log(`board.tick10: \n`)
+// board.tick()
+// console.log(board.toString());
+// console.log(`board.tick11: \n`)
+// board.tick()
+// console.log(board.toString());
+// console.log(`board.tick12: \n`)
+// board.tick()
+// console.log(board.toString());
+
 
 
