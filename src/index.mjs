@@ -1,9 +1,7 @@
-import { Board } from "./Board.mjs";
-import { ScoringSystem } from "./ScoringSystem.mjs";
-import { ShuffleBag } from "./ShuffleBag.mjs";
-import { Tetromino } from "./Tetromino.mjs";
-
-// TODO: change this code to match the API you have created, if you want to run the game for some manual testing
+import { Board } from "./Board.ts";
+import { ScoringSystem } from "./ScoringSystem.ts";
+import { ShuffleBag } from "./ShuffleBag.ts";
+import { Tetromino } from "./Tetromino.ts";
 
 function initGame() {
   const canvas = document.getElementById("game");
@@ -16,9 +14,7 @@ function initGame() {
   };
   game.scoring = new ScoringSystem();
   game.board = new Board(game.columns, game.rows);
-  game.board.onClearLine = (lineCount) => {
-    game.scoring.linesCleared(lineCount);
-  };
+  game.board.addObserver(game.scoring);
   game.tetrominoes = new ShuffleBag([
     Tetromino.I_SHAPE,
     Tetromino.T_SHAPE,
@@ -33,7 +29,7 @@ function initGame() {
   document.addEventListener("keydown", (event) => {
     if (event.code === "Space") {
       for (let i = 0; i < game.rows; i++) {
-        game.board.moveDown();
+        game.board.tick();
       }
     } else if (event.key === "z") {
       game.board.rotateLeft();
@@ -42,15 +38,15 @@ function initGame() {
     } else if (event.code === "ArrowUp") {
       game.board.rotateRight();
     } else if (event.code === "ArrowDown") {
-      game.board.moveDown();
+      game.board.tick();
     } else if (event.code === "ArrowLeft") {
-      game.board.moveLeft();
+      game.board.toLeft();
     } else if (event.code === "ArrowRight") {
-      game.board.moveRight();
+      game.board.toRight();
     } else {
       return;
     }
-    event.preventDefault(); // prevent game keys from scrolling the window
+    event.preventDefault();
   });
 
   const render = (timestamp) => {

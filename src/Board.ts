@@ -31,7 +31,7 @@ export class Board {
     this.currentField = Array();
     this.shapes = Array();
     this.dropStatus = 0;
-    this.hasFallingStatus = true;
+    this.hasFallingStatus = false;
     this.currentEntityMemory = Array()
     this.heightOffset = 0
     this.widthOffset = 0
@@ -441,6 +441,10 @@ export class Board {
     this.tickState = 1;
     this.newDirection = "DOWN"
     this.toString();
+  }
+
+  cellAt(row: number, column: number): string {
+    return this.currentField[row][column]
   }
 
   hasFalling() {
