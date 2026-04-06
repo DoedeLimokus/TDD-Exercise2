@@ -215,21 +215,22 @@ describe("Rotating falling tetrominoes", () => {
     })
 
     test("it cannot be rotated when completely blocked", () => {
-        let narrowBoard = new Board(4, 6)
+        let narrowBoard = new Board(5, 6)
+        narrowBoard.drop("I")
+        fallToBottom(narrowBoard)
         narrowBoard.drop("I")
         fallToBottom(narrowBoard)
         narrowBoard.drop("I")
         narrowBoard.tick()
-        narrowBoard.tick()
         narrowBoard.rotateRight()
 
         expect(narrowBoard.toString()).to.equalShape(
-            `....
-             ....
-             ....
-             ....
-             IIII
-             IIII`
+            `.....
+             ....I
+             ....I
+             ....I
+             IIIII
+             IIII.`
         )
         expect(narrowBoard.hasFalling(), "the block should still be falling").to.be.true
     })

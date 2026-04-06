@@ -78,6 +78,7 @@ export class Board {
         this.hasFallingStatus = false;
         this.state = 1;
         this.entityPosition = 0;
+        this.clearLines()
       } 
       else if (result == 3){
         // console.log("Je kan niet voorbij de zijkant")
@@ -94,6 +95,7 @@ export class Board {
         this.hasFallingStatus = false;
         this.state = 1;
         this.entityPosition = 0;
+        this.clearLines()
       }
     }
     return this.currentField.map((rij) => rij.join("")).join("");
@@ -376,6 +378,29 @@ export class Board {
     }
   }
 
+
+  clearLines(){
+    let newField = Array()
+    let clearedCount = 0
+    for (let i = 0; i < this.currentField.length; i++){
+      let isFull = true
+      for (let j = 0; j < this.width; j++){
+        if (this.currentField[i][j] == '.'){
+          isFull = false
+          break
+        }
+      }
+      if (isFull){
+        clearedCount++
+      } else {
+        newField.push(this.currentField[i])
+      }
+    }
+    for (let i = 0; i < clearedCount; i++){
+      newField.unshift([...this.emptyRowArray])
+    }
+    this.currentField = newField
+  }
 
   rotateRight(){
     this.rotation++
