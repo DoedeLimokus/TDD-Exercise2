@@ -19,6 +19,7 @@ export class Board {
   xCoord: number
   newDirection: "LEFT"|"RIGHT"|"DOWN"|"ROTATION LEFT"|"ROTATION RIGHT"
   rotation: number
+  observers: Array<any>
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -37,6 +38,7 @@ export class Board {
     this.xCoord = this.width / 2
     this.newDirection = "DOWN"
     this.rotation = 0
+    this.observers = Array()
 
     // console.log("init")
     this.emptyRowArray = new Array(this.width).fill(".");
@@ -379,6 +381,10 @@ export class Board {
   }
 
 
+  addObserver(observer: any){
+    this.observers.push(observer)
+  }
+
   clearLines(){
     let newField = Array()
     let clearedCount = 0
@@ -400,6 +406,9 @@ export class Board {
       newField.unshift([...this.emptyRowArray])
     }
     this.currentField = newField
+    if (clearedCount > 0){
+      this.observers.forEach(observer => observer.onLinesCleared(clearedCount))
+    }
   }
 
   rotateRight(){
